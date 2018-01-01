@@ -11,6 +11,8 @@ from org.apache.lucene.search import IndexSearcher, PhraseQuery
 from org.apache.lucene.document import Document, Field, TextField, StoredField, FieldType
 from org.apache.lucene.analysis.standard import StandardAnalyzer
 
+from utils import get_stemmed_string
+
 
 class CreateIndex(object):
     """
@@ -39,6 +41,7 @@ class CreateIndex(object):
         """
         writerConfig = IndexWriterConfig(StandardAnalyzer())
         writerConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE)
+        #writerConfig.setSimilarity(ClassicSimilarity())
         writer = IndexWriter(index_dir, writerConfig)
         return writer
 
@@ -71,7 +74,7 @@ class CreateIndex(object):
                 doc = Document()
                 lines_split = lines.split('|__|')
                 doc.add(StoredField("id", lines_split[0]))
-                doc.add(Field("paragraphs", lines_split[1], contentType))
+                doc.add(Field("paragraphs", get_stemmed_string(lines_split[1].lower()), contentType))
                 writer_obj.addDocument(doc)
         writer_obj.close()
 
