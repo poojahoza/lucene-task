@@ -8,10 +8,11 @@ from org.apache.lucene.store import FSDirectory
 from org.apache.lucene.index import IndexWriter, IndexWriterConfig, DirectoryReader, \
     IndexOptions, Term
 from org.apache.lucene.search import IndexSearcher, PhraseQuery
-from org.apache.lucene.document import Document, Field, TextField, StoredField, FieldType
+from org.apache.lucene.document import Document, Field, TextField, StoredField, FieldType, StringField
 from org.apache.lucene.analysis.standard import StandardAnalyzer
 
 from utils import get_stemmed_string
+from constructKeywordQuery import get_paragraphs
 
 
 class CreateIndex(object):
@@ -69,13 +70,13 @@ class CreateIndex(object):
         contentType.setStored(True)
         contentType.setTokenized(True)
 
-        with open(input_file, 'r') as f:
-            for lines in f:
-                doc = Document()
-                lines_split = lines.split('|__|')
-                doc.add(StoredField("id", lines_split[0]))
-                doc.add(Field("paragraphs", get_stemmed_string(lines_split[1].lower()), contentType))
-                writer_obj.addDocument(doc)
+        paras = get_paragraphs(input_file)
+        for p in paras:
+            doc = Document()
+            lines_split = p.split('|__|')
+            doc.add(StringField("id", lines_split[0], Field.Store.YES))
+            doc.add(Field("paragraphs", get_stemmed_string(lines_split[1].lower()), contentType))
+            writer_obj.addDocument(doc)
         writer_obj.close()
 
     def index_documents(self, input_file):

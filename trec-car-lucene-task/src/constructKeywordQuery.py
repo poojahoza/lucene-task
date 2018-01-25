@@ -1,4 +1,4 @@
-from trec_car.read_data import iter_annotations
+from trec_car.read_data import iter_annotations, iter_paragraphs, ParaText
 import re
 
 
@@ -14,3 +14,11 @@ def get_keyword_queries(input_outlines_file):
                 page_details.append((headlines_id, headlines))
 
     return page_details
+
+def get_paragraphs(paragraphs_file):
+    with open(paragraphs_file, 'rb') as f:
+        for p in iter_paragraphs(f):
+            texts = [elem.text if isinstance(elem, ParaText)
+                 else elem.anchor_text
+                 for elem in p.bodies]
+            yield p.para_id+'|__|'+(' '.join(texts))

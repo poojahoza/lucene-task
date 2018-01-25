@@ -4,7 +4,7 @@
 import sys
 from createIndex import CreateIndex
 from rankDocuments import RankDocuments
-from constructKeywordQuery import get_keyword_queries
+from constructKeywordQuery import get_keyword_queries, get_paragraphs
 from utils import get_stemmed_string
 
 RANKING_FUNCTIONS = ['BM25', 'VSM']
@@ -13,18 +13,19 @@ DEFAULT_RANK_FUNCTION = 'BM25'
 if __name__ == "__main__":
 
     if len(sys.argv) == 1:
-        print('Please enter outline_file ranking_function')
-        print('Usage index.py outline_file ranking_function')
+        print('Please enter outline_file ranking_function paragraphs_file')
+        print('Usage index.py outline_file ranking_function paragraphs_file')
         exit()
 
     outlines_file_name = sys.argv[1]
     ranking_function = sys.argv[2]
+    paragraphs_file_name = sys.argv[3]
     if ranking_function not in RANKING_FUNCTIONS:
         ranking_function = DEFAULT_RANK_FUNCTION
     output_file_name = 'output_%s.txt'%ranking_function
 
     create_ind_obj = CreateIndex()
-    search_object = create_ind_obj.index_documents('paragraphs_input.txt')
+    search_object = create_ind_obj.index_documents(paragraphs_file_name)
 
     rank_obj = RankDocuments(search_object)
     rank_obj.set_searcher_similarity(ranking_function)
